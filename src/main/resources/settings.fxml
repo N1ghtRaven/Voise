@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="269.0" prefWidth="457.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="xyz.zaddrot.ui.Settings">
+  <children>
+    <HBox id="HBox" alignment="CENTER" layoutX="1.0" layoutY="234.0" prefHeight="48.0" prefWidth="494.0" spacing="5.0">
+      <children>
+        <Button mnemonicParsing="false" onMouseClicked="#onPressAdd" text="+">
+          <HBox.margin>
+            <Insets right="250.0" />
+          </HBox.margin>
+        </Button>
+        <Button mnemonicParsing="false" onMouseClicked="#onSave" text="Сохранить">
+          <HBox.margin>
+            <Insets right="50.0" />
+          </HBox.margin>
+        </Button>
+      </children>
+    </HBox>
+    <ScrollPane fx:id="ScrollPane" hbarPolicy="NEVER" layoutX="0.0" layoutY="0.0" pannable="true" prefHeight="234.0" prefWidth="467.0" vbarPolicy="ALWAYS" vmax="1.0" vvalue="1.0">
+      <content>
+        <AnchorPane id="Content" fx:id="Scroll2" minHeight="0.0" minWidth="0.0" prefHeight="218.0" prefWidth="480.0">
+          <children>
+            <VBox fx:id="Vbox" layoutX="0.0" layoutY="4.0" prefHeight="218.0" prefWidth="494.0">
+              <children>
+                <HBox id="HBox" alignment="TOP_LEFT" spacing="12.0">
+                  <children>
+                    <Label text="Горячая клавиша:" HBox.hgrow="NEVER">
+                      <HBox.margin>
+                        <Insets top="3.0" />
+                      </HBox.margin>
+                    </Label>
+                    <ComboBox fx:id="ComboBox" prefHeight="21.0" prefWidth="147.0" promptText="Модификатор">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Без модификатора" />
+                          <String fx:value="Shift" />
+                          <String fx:value="Ctrl" />
+                          <String fx:value="Alt" />
+                          <String fx:value="Win" />
+                        </FXCollections>
+                      </items>
+                    </ComboBox>
+                    <TextField fx:id="Symbol" disable="false" editable="false" onKeyReleased="#onRelease" prefWidth="115.0" promptText="Символ" />
+                  </children>
+                  <VBox.margin>
+                    <Insets left="35.0" />
+                  </VBox.margin>
+                </HBox>
+              </children>
+            </VBox>
+          </children>
+        </AnchorPane>
+      </content>
+    </ScrollPane>
+  </children>
+</AnchorPane>

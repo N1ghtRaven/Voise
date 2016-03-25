@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="297.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="xyz.zaddrot.ui.Main">
+  <children>
+    <AnchorPane id="Content" layoutX="-5.0" layoutY="11.0" minHeight="0.0" minWidth="0.0" prefHeight="50.0" prefWidth="275.0">
+      <children>
+        <Label layoutX="6.0" layoutY="25.0" text="Статус:" />
+        <Label fx:id="status" layoutX="51.0" layoutY="25.0" text="Необходимо сконфигурировать приложение" />
+        <ToolBar layoutX="6.0" layoutY="-10.0" prefWidth="310.0">
+          <items>
+            <ToggleButton fx:id="button" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onMouseClicked="#onBinderButton" text="Запустить перехват" textFill="#00a610" />
+            <Button mnemonicParsing="false" onMouseClicked="#onSetting" text="Настройки" />
+          </items>
+        </ToolBar>
+      </children>
+    </AnchorPane>
+  </children>
+</AnchorPane>
