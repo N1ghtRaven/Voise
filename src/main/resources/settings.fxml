@@ -12,9 +12,14 @@
       <children>
         <Button mnemonicParsing="false" onMouseClicked="#onPressAdd" text="+">
           <HBox.margin>
-            <Insets right="250.0" />
+            <Insets right="100.0" />
           </HBox.margin>
         </Button>
+        <CheckBox fx:id="isListen" mnemonicParsing="false" text="Слушать по умолчанию">
+          <HBox.margin>
+            <Insets right="15.0" />
+          </HBox.margin>
+        </CheckBox>
         <Button mnemonicParsing="false" onMouseClicked="#onSave" text="Сохранить">
           <HBox.margin>
             <Insets right="50.0" />

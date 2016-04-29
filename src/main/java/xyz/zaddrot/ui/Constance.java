@@ -6,8 +6,11 @@ import java.io.File;
  * Created by night on 19.03.2016.
  */
 public class Constance {
-    final public static String MAIN_TITLE = "VoiseListener - 1.0.1";
+    final public static String YA_URI = "https://asr.yandex.net/asr_xml?uuid=4f3dce41ac2d4f78bb2a0212ba018b6a&key=416da2ff-5401-439c-9a81-4c6b98c6373b&topic=queries";
+    final public static String MAIN_TITLE = "VoiseListener - 1.0.2";
     final public static String MAIN_ICO = "/images/mic.png";
+
+    final public static String SOUND_RECORD_ON = "/sounds/alert.mp3";
 
     //TODO: Исправить UI
     final public static String STATUS_ON = "Комбинация перехватывается";

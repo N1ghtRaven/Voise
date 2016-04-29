@@ -13,6 +13,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -57,7 +59,6 @@ public class Main extends Application {
             Map<String, Integer> data = new HashMap<String, Integer>();
             data.put("main_x", (int) main_window.getX());
             data.put("main_y", (int) main_window.getY());
-
             try {
                 data.put("setting_x", (int) main_window.getX());
                 data.put("setting_y", (int) main_window.getY());
@@ -65,6 +66,7 @@ public class Main extends Application {
             FileWriter writer = null;
             try{ writer = new FileWriter(Constance.CFG_WINDOW); }catch (IOException e) {}
             yaml.dump(data, writer);
+
             System.exit(0);
         });
         primaryStage.show();
@@ -72,9 +74,22 @@ public class Main extends Application {
     @FXML
     private void initialize() {
         if(Constance.CFG_COMMANDS.exists()) {
-            //TODO: Индикатор записи звука
             button.setDisable(false);
-            status.setText(Constance.STATUS_OFF);
+            Map<String, Map> cfg = new HashMap<String, Map>();
+            Yaml yaml = new Yaml();
+            try{ cfg = (Map<String, Map>) yaml.load(new FileInputStream(Constance.CFG_COMMANDS)); }catch (FileNotFoundException e) {}
+
+            Map<String, Boolean> listen = cfg.get("isListen");
+            if(listen.get("isListen")) {
+                button.setSelected(true);
+                button.setTextFill(Paint.valueOf("#cc0000"));
+                status.setText(Constance.STATUS_ON);
+                Bind.start();
+            }
+            else{
+                button.setSelected(false);
+                status.setText(Constance.STATUS_OFF);
+            }
         }
     }
 
@@ -123,7 +138,6 @@ public class Main extends Application {
             stage.setX(100);
             stage.setY(100);
         }
-
         setting_window.show();
         setting_window.setOnCloseRequest((WindowEvent we) -> {
             main_window.show();
@@ -136,7 +150,12 @@ public class Main extends Application {
             data.put("setting_y", (int) setting_window.getY());
 
             FileWriter writer = null;
-            try{ writer = new FileWriter(Constance.CFG_WINDOW); }catch (IOException e) {}
+            try{ writer = new FileWriter(Constance.CFG_WINDOW); }catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Ошибка");
+                alert.setHeaderText("Ошибка при сохранении настроек");
+                alert.setContentText("Закройте все программы использующие файл настроек.");
+            }
             yaml.dump(data, writer);
 
             if(Constance.CFG_COMMANDS.exists()) {

@@ -1,6 +1,9 @@
 package xyz.zaddrot.stt;
 
-import javafx.scene.image.Image;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.yaml.snakeyaml.Yaml;
@@ -29,23 +32,38 @@ public class AudioHandler {
         for(int i = 1;i < cfg.size();++i){
             Map<String, String> command = cfg.get("Command_"+i);
             if(sourceCommand.equalsIgnoreCase(command.get("com").toString())) {
-                try { Runtime.getRuntime().exec("cmd /c "+command.get("pth")); } catch (IOException e) {e.printStackTrace();}
+                try { Runtime.getRuntime().exec("cmd /c "+command.get("pth")); } catch (IOException e) {e.printStackTrace();
+                    Platform.runLater(new Runnable() {
+                        public void run() {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Ошибка");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Ошибка при выполнении команды.");
+                            alert.showAndWait();
+                        }});
+                }
             }
         }
     }
 
     private static File recorder(){
         try{
-            Main rec =  new Main();
-
             AudioFormat format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100,16,2,4,44100,false);
 
             DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-            if(!AudioSystem.isLineSupported(info)) { System.out.println("Запись не поддерживается"); }
+            if(!AudioSystem.isLineSupported(info)) {  Alert alert = new Alert(Alert.AlertType.ERROR);
+                Platform.runLater(() -> {
+                alert.setTitle("Ошибка");
+                alert.setHeaderText("Ошибка при записи голоса");
+                alert.setContentText("Запись не поддерживается устройством.");
+                alert.showAndWait();
+            });
+            }
 
             final TargetDataLine targetLine = (TargetDataLine)AudioSystem.getLine(info);
             targetLine.open();
 
+            new Thread(() -> { playSound(); }).start();
             System.out.println("Идёт запись...");
             targetLine.start();
             Constance.AUDIO_PATH.mkdir();
@@ -54,8 +72,16 @@ public class AudioHandler {
                 @Override
                 public void run(){
                     AudioInputStream audioStream = new AudioInputStream(targetLine);
-                    try { AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, audioFile); } catch (IOException e) { e.printStackTrace(); }
+                    try { AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, audioFile); } catch (IOException e) {  Alert alert = new Alert(Alert.AlertType.ERROR);
+                        Platform.runLater(() -> {
+                            alert.setTitle("Ошибка");
+                            alert.setHeaderText("Ошибка при сохранении голоса");
+                            alert.setContentText("Убедитесь что звуковой файл rec.mp3 не используется другими программами.");
+                            alert.showAndWait();
+                        });
+                    }
                     System.out.println("Запись завершена");
+                    new Thread(() -> { playSound(); }).start();
                 }
             };
             thread.start();
@@ -64,6 +90,9 @@ public class AudioHandler {
             targetLine.close();
 
             System.out.println("Конец записи");
+
+            new Thread(() -> { playSound(); }).start();
+
             return audioFile;
         }catch(InterruptedException | LineUnavailableException e) { e.printStackTrace(); }
         return null;
@@ -71,7 +100,7 @@ public class AudioHandler {
 
     private static String detectCommand(File file){
         try {
-            URL url = new URL("https://asr.yandex.net/asr_xml?uuid=4f3dce41ac2d4f78bb2a0212ba018b6a&key=416da2ff-5401-439c-9a81-4c6b98c6373b&topic=queries");
+            URL url = new URL(Constance.YA_URI);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
@@ -80,7 +109,7 @@ public class AudioHandler {
             OutputStream out = connection.getOutputStream();
             InputStream comFile = new FileInputStream(file);
             byte[] fileBArray = new byte[4096];
-            for (int length = 0; (length = comFile.read(fileBArray)) > 0; ) {
+            for (int length; (length = comFile.read(fileBArray)) > 0; ) {
                 out.write(fileBArray, 0, length);
             }
             out.flush();
@@ -98,7 +127,33 @@ public class AudioHandler {
             Document doc = builder.parse(is);
 
             return new String(doc.getDocumentElement().getElementsByTagName("variant").item(0).getChildNodes().item(0).getNodeValue().getBytes("Cp1251"), "UTF-8");
-        }catch (Exception ex){ ex.printStackTrace(); }
+        }catch (Exception ex){ ex.printStackTrace();
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Ошибка");
+                alert.setHeaderText("Ошибка при обработке голоса");
+                alert.setContentText("Проверьте правильность записи голоса, наличие подключения к Интернету.");
+                alert.showAndWait();
+            });
+        }
         return null;
+    }
+
+    public static void playSound() {
+        InputStream fis = Main.class.getResourceAsStream(Constance.SOUND_RECORD_ON);
+        BufferedInputStream bis = new BufferedInputStream(fis);
+        try{
+            Player player = new Player(bis);
+            player.play();
+        }catch(JavaLayerException ex){
+            Platform.runLater(new Runnable() {
+                public void run() {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Ошибка");
+                    alert.setHeaderText("Ошибка запуска звукового файла");
+                    alert.setContentText("Проверьте настройки вашей аудиокарты.");
+                    alert.showAndWait();
+                }});
+        }
     }
 }

@@ -129,9 +129,16 @@ public class Settings {
     }
 
     @FXML
+    private CheckBox isListen;
+
+    @FXML
     public void onSave() {
         Map<String, Map> cfg = new HashMap<String, Map>();
         Yaml yaml = new Yaml();
+
+        Map<String, Boolean> listen = new HashMap<>();
+        listen.put("isListen", isListen.isSelected());
+        cfg.put("isListen",listen);
 
         for(int i = 0; i < Vbox.getChildren().size(); ++i){
             HBox node1 = (HBox) Vbox.getChildren().get(i);
@@ -145,13 +152,9 @@ public class Settings {
             }
             else{
                 TextField c = (TextField) node1.getChildren().get(1);
-                try {
-                    dataMap.put("com", new String(c.getText().getBytes("UTF-8"), "Cp1251"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                try { dataMap.put("com", new String(c.getText().getBytes("UTF-8"), "Cp1251")); } catch (UnsupportedEncodingException e) { e.printStackTrace(); }
                 TextField t2 = (TextField) node1.getChildren().get(2);
-                dataMap.put("pth", t2.getPromptText());
+                try { dataMap.put("pth", new String(t2.getPromptText().getBytes("UTF-8"), "Cp1251")); } catch (UnsupportedEncodingException e) { e.printStackTrace(); }
                 cfg.put("Command_"+i,dataMap);
             }
         }
@@ -190,9 +193,13 @@ public class Settings {
         Symbol.setText(hotKey.get("sym"));
         ComboBox.setValue(hotKey.get("mod"));
 
+        Map<String, Boolean> listen = cfg.get("isListen");
+        isListen.setSelected(listen.get("isListen"));
+
         for(int i = 1;i < cfg.size();++i){
 
             Map<String, String> command = cfg.get("Command_"+i);
+
             String CommandText = command.get("com");
             String FilePath = command.get("pth");
 

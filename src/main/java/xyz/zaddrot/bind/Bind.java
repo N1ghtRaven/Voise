@@ -2,6 +2,8 @@ package xyz.zaddrot.bind;
 
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import org.yaml.snakeyaml.Yaml;
 import xyz.zaddrot.ui.Constance;
 import xyz.zaddrot.stt.AudioHandler;
@@ -15,13 +17,11 @@ import java.util.Map;
  * Created by night on 20.03.2016.
  */
 public class Bind {
-    private static HotkeyListener hotkeyListener = new HotkeyListener() {
-        public void onHotKey (int i) {
-            if(i == 0) {
-                //TODO: Переход в метод парсинга голоса
-                System.out.println("Main");
-                AudioHandler.main();
-            }
+    private static HotkeyListener hotkeyListener = i -> {
+        if(i == 0) {
+            //TODO: Переход в метод парсинга голоса
+            System.out.println("Main");
+            AudioHandler.main();
         }
     };
 
@@ -34,7 +34,16 @@ public class Bind {
 
         Map<String, Map> cfg = new HashMap<>();
         Yaml yaml = new Yaml();
-        try{ cfg = (Map<String, Map>) yaml.load(new FileInputStream(Constance.CFG_COMMANDS)); }catch (FileNotFoundException e) {}
+        try{ cfg = (Map<String, Map>) yaml.load(new FileInputStream(Constance.CFG_COMMANDS)); }catch (FileNotFoundException e) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Ошибка");
+                alert.setHeaderText("Ошибка при чтении настроек");
+                alert.setContentText("Закройте все программы использующие файл настроек.");
+
+                alert.showAndWait();
+            });
+        }
 
         Map<String, String> hotKey = cfg.get("HotKey");
         String SymbolText = hotKey.get("sym");
